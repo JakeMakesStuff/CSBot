@@ -14,6 +14,6 @@ RUN wget https://download.oracle.com/otn_software/linux/instantclient/instantcli
     cd instantclient* && \
     rm -f *jdbc* *occi* *mysql* *jar uidrvci genezi adrci && \
     echo /opt/oracle/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig
+    ldconfig && cd /var/app
 COPY --from=0 /var/app .
 ENTRYPOINT ./app
