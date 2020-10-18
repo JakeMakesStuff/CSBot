@@ -22,6 +22,9 @@ import (
 )
 
 func formatQuery(res *sql.Rows) (formatted string, rows int) {
+	// Close the rows when we're done.
+	defer res.Close()
+
 	// Return nothing.
 	setNothing := func() {
 		rows = 0

@@ -2,7 +2,6 @@
 The class Discord bot. This bot probably isn't very useful to you if you're not in my class and contains a lot of in jokes.
 
 ## Dev Environment
-
 Note that `TOKEN` is a required env variable to be able to connect to Discord. You must set this for the bot to run.
 
 ## SQL Sandbox Deployment Information
