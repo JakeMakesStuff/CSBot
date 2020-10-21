@@ -206,7 +206,7 @@ func init() {
 			image := "store/oracle/database-enterprise:12.2.0.1-slim"
 			var env []string
 			if mysql {
-				image = "_/mysql:latest"
+				image = "mysql"
 				env = []string{"MYSQL_ALLOW_EMPTY_PASSWORD=yes", "MYSQL_DATABASE=sandbox"}
 			}
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
