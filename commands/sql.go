@@ -271,7 +271,7 @@ func init() {
 			driverName := "godror"
 			if mysql {
 				driverName = "mysql"
-				dataSourceName = "root:@"+info.NetworkSettings.IPAddress+"/sandbox"
+				dataSourceName = "root:@tcp("+info.NetworkSettings.IPAddress+")/sandbox"
 			}
 			db, err := sql.Open(driverName, dataSourceName)
 			if err != nil {
