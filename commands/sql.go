@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/godror/godror"
 	"github.com/hako/durafmt"
 	"github.com/jakemakesstuff/structuredhttp"
@@ -176,8 +177,18 @@ func init() {
 	router.Router.SetCommand(&gommand.Command{
 		Name:                 "sql",
 		Description:          "Start a sandboxed Oracle SQL environment.",
+		Usage: "[use mysql (true/false, defaults to false)]",
 		Category:             categories.Learning,
+		ArgTransformers: []gommand.ArgTransformer{
+			{
+				Function: gommand.BooleanTransformer,
+				Optional: true,
+			},
+		},
 		Function: func(ctx *gommand.Context) error {
+			// Defines if we should use mysql.
+			mysql, _ := ctx.Args[0].(bool)
+
 			// Handle if not configured.
 			if cli == nil {
 				_, _ = ctx.Reply("Docker is not configured.")
@@ -192,8 +203,15 @@ func init() {
 			if err != nil {
 				return nil
 			}
+			image := "store/oracle/database-enterprise:12.2.0.1-slim"
+			var env []string
+			if mysql {
+				image = "mysql"
+				env = []string{"MYSQL_ALLOW_EMPTY_PASSWORD=yes", "MYSQL_DATABASE=sandbox"}
+			}
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
-				Image: "store/oracle/database-enterprise:12.2.0.1-slim",
+				Image: image,
+				Env: env,
 			}, nil, nil, msg.ID.String())
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
@@ -249,18 +267,26 @@ func init() {
 			}
 
 			// Attempt to connect to the DB.
-			db, err := sql.Open("godror", `user="system" password="Oradoc_db1" connectString="`+info.NetworkSettings.IPAddress+`/ORCLCDB.localdomain"`)
+			dataSourceName := `user="system" password="Oradoc_db1" connectString="`+info.NetworkSettings.IPAddress+`/ORCLCDB.localdomain"`
+			driverName := "godror"
+			if mysql {
+				driverName = "mysql"
+				dataSourceName = "root:@"+info.NetworkSettings.IPAddress+"/sandbox"
+			}
+			db, err := sql.Open(driverName, dataSourceName)
 			if err != nil {
 				_, _ = ctx.Reply(ctx.Message.Author.Mention(), err.Error())
 				return nil
 			}
 
 			// Loop until a ping succeeds to get around a bug with the Oracle DB official docker image where the user isn't immediately made when the node reports healthy.
-			for {
-				if err := db.Ping(); err == nil {
-					break
+			if !mysql {
+				for {
+					if err := db.Ping(); err == nil {
+						break
+					}
+					time.Sleep(100 * time.Millisecond)
 				}
-				time.Sleep(100 * time.Millisecond)
 			}
 
 			// Delete the old message.
