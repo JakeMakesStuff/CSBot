@@ -14,6 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godror/godror v0.20.5
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026
 	github.com/jakemakesstuff/structuredhttp v0.0.0-20201005102351-90f89384e643
 	github.com/olekukonko/tablewriter v0.0.4
