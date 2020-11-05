@@ -110,7 +110,7 @@ func init() {
 			}
 			defer conn.Close()
 			remoteAddr := conn.RemoteAddr().(*net.UDPAddr).IP.String()
-			_, _, _ = msg.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
+			_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
 
 			// Garbage collect.
 			//_ = cli.ContainerRemove(context.TODO(), res.ID, types.ContainerRemoveOptions{Force: true})
