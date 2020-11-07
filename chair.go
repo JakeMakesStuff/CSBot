@@ -118,10 +118,16 @@ func messageCreateChair(s disgord.Session, evt *disgord.MessageCreate) {
 				logrus.Error(err)
 				return
 			}
-			chairs := make([]*pb.LocalizedObjectAnnotation, 0, len(crops))
+			chairs := make([]struct{
+				couch bool
+				region *pb.LocalizedObjectAnnotation
+			}, 0, len(crops))
 			for _, v := range crops {
-				if v.Name == "Chair" {
-					chairs = append(chairs, v)
+				if v.Name == "Chair" || v.Name == "Couch" {
+					chairs = append(chairs, struct {
+						couch  bool
+						region *pb.LocalizedObjectAnnotation
+					}{couch: v.Name == "Couch", region: v})
 				}
 			}
 			if len(chairs) == 0 {
@@ -148,13 +154,12 @@ func messageCreateChair(s disgord.Session, evt *disgord.MessageCreate) {
 			// Create the rectangle for each animal.
 			ImageX := imgObj.Bounds().Dx()
 			ImageY := imgObj.Bounds().Dy()
-			rects := make([]image.Rectangle, len(chairs))
-			for i, chair := range chairs {
+			for _, chair := range chairs {
 				LowestX := 9999999999
 				LowestY := 9999999999
 				HighestX := 0
 				HighestY := 0
-				for _, verts := range chair.BoundingPoly.NormalizedVertices {
+				for _, verts := range chair.region.BoundingPoly.NormalizedVertices {
 					RealY := int(verts.Y * float32(ImageY))
 					RealX := int(verts.X * float32(ImageX))
 					if LowestX > RealX {
@@ -170,22 +175,23 @@ func messageCreateChair(s disgord.Session, evt *disgord.MessageCreate) {
 						HighestY = RealY
 					}
 				}
-				rects[i] = image.Rect(
+				rect := image.Rect(
 					LowestX,
 					LowestY,
 					HighestX,
 					HighestY,
 				)
-			}
 
-			// Go through each rectangle, crop it and meme it.
-			for _, rect := range rects {
 				// Crop this part out.
 				rgba := image.NewRGBA(rect)
 				draw.Draw(rgba, rect, imgObj, rect.Min, draw.Over)
 
 				// Create the font image.
-				rendered := RenderText("CHAIR", rect.Dy()/10)
+				label := "CHAIR"
+				if chair.couch {
+					label = "TORY " + label
+				}
+				rendered := RenderText(label, rect.Dy()/10)
 
 				// Create the point.
 				pt := image.Point{}
