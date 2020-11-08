@@ -46,7 +46,6 @@ func init() {
 			}
 			b := &bytes.Buffer{}
 			w := zip.NewWriter(b)
-			defer w.Close()
 			walker := func(path string, info os.FileInfo, err error) error {
 				if err != nil {
 					return err
@@ -74,6 +73,7 @@ func init() {
 				return err
 			}
 			channel, err := ctx.Session.CreateDM(context.TODO(), ctx.Message.Author.ID)
+			_ = w.Close()
 			if err == nil {
 				_, err = ctx.Session.SendMsg(context.TODO(), channel.ID, &disgord.CreateMessageFileParams{
 					Reader:     b,
