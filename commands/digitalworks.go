@@ -80,7 +80,7 @@ func init() {
 						if r.PartialEmoji.Name == "♻" {
 							// Destroy the container.
 							_ = cli.ContainerRemove(context.TODO(), c.ID, types.ContainerRemoveOptions{Force: true})
-							_, _ = ctx.Reply(ctx.Message.Author.Mention(), "Database deleted.")
+							_, _ = ctx.Reply(ctx.Message.Author.Mention(), "Container deleted.")
 						} else {
 							// Resend the credentials via DMs.
 							conn, err := net.Dial("udp", "8.8.8.8:80")
@@ -101,6 +101,7 @@ func init() {
 							}
 							port := c.HostConfig.PortBindings["5900/tcp"][0].HostPort
 							_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
+							_, _ = ctx.Reply(ctx.Message.Author.Mention(), "Login credentials DM'd.")
 						}
 					}
 				}
