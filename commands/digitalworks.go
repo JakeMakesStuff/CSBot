@@ -69,9 +69,9 @@ func init() {
 				}
 				return nil
 			}
-			err = filepath.Walk("input", walker)
+			err = filepath.Walk(persistenceDir, walker)
 			if err != nil {
-				panic(err)
+				return err
 			}
 			channel, err := ctx.Session.CreateDM(context.TODO(), ctx.Message.Author.ID)
 			if err == nil {
