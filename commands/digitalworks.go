@@ -73,7 +73,6 @@ func init() {
 			portMap := nat.PortMap{
 				"5900/tcp": {
 					{
-						HostIP: "0.0.0.0",
 						// TODO: We should probably make this less random, but realistically it's probably fine for now.
 						HostPort: port,
 					},
