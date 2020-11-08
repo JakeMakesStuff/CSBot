@@ -58,7 +58,7 @@ func init() {
 				return nil
 			}
 
-			// Check if the container already exists.
+			// Check if the container already exists. If so manage showing the user options relating to this.
 			containerName := ctx.Message.Author.ID.String() + "-vnc"
 			filter := filters.NewArgs()
 			filter.ExactMatch("name", containerName)
@@ -67,7 +67,10 @@ func init() {
 				return err
 			}
 			if len(containers) != 0 {
-				_, _ = ctx.Reply("test")
+				message := "You already have a DigitalWorks container running. This means you have 2 options:\n\n" +
+					"♻️ **Destroy the container:** You will want to do this if you want to change the resolution of your container. Note that this will not destroy your persistent folder on your desktop, but will destroy all other container content.\n" +
+					"✉️ **Re-send the credentials:** Resends the login credentials in a DM."
+				_, _ = ctx.Reply(message)
 				return nil
 			}
 
