@@ -14,6 +14,7 @@ import (
 func main() {
 	s, err := disgord.NewClient(disgord.Config{
 		BotToken: os.Getenv("TOKEN"),
+
 	})
 	if err != nil {
 		panic(err)

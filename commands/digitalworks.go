@@ -73,6 +73,9 @@ func init() {
 				if err == nil {
 					deadline, _ := context.WithTimeout(context.TODO(), time.Minute*10)
 					r := ctx.WaitManager.WaitForMessageReactionAdd(deadline, func(_ disgord.Session, evt *disgord.MessageReactionAdd) bool {
+						println(evt.PartialEmoji.String())
+						fmt.Println(evt)
+						fmt.Println(msg)
 						return evt.MessageID == msg.ID && evt.UserID == ctx.Message.Author.ID && (evt.PartialEmoji.String() == "♻" || evt.PartialEmoji.String() == "✉️")
 					})
 					_ = ctx.Session.DeleteMessage(context.TODO(), msg.ChannelID, msg.ID)
