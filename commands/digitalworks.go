@@ -9,6 +9,7 @@ import (
 	"github.com/auttaja/gommand"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
@@ -27,14 +28,16 @@ func init() {
 	router.Router.SetCommand(&gommand.Command{
 		Name:                 "digitalworks",
 		Description:          "Start a sandboxed DigitalWorks VNC environment. You will then get DM'd the VNC hostname and password.",
-		Usage: "<width> <height>",
+		Usage: "[width (defaults to 800)] [height (defaults to 600)]",
 		Category:             categories.Learning,
 		ArgTransformers: []gommand.ArgTransformer{
 			{
 				Function: gommand.UIntTransformer,
+				Optional: true,
 			},
 			{
 				Function: gommand.UIntTransformer,
+				Optional: true,
 			},
 		},
 		Function: func(ctx *gommand.Context) error {
@@ -52,6 +55,19 @@ func init() {
 			// Handle if not configured.
 			if cli == nil {
 				_, _ = ctx.Reply("Docker is not configured.")
+				return nil
+			}
+
+			// Check if the container already exists.
+			containerName := ctx.Message.Author.ID.String() + "-vnc"
+			filter := filters.NewArgs()
+			filter.ExactMatch("name", containerName)
+			containers, err := cli.ContainerList(context.TODO(), types.ContainerListOptions{Filters: filter})
+			if err != nil {
+				return err
+			}
+			if len(containers) != 0 {
+				_, _ = ctx.Reply("test")
 				return nil
 			}
 
@@ -81,7 +97,7 @@ func init() {
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: "wine-digitalworks-vnc",
 				Env: env,
-			}, &container.HostConfig{PortBindings: portMap}, nil, msg.Author.ID.String() + "-vnc")
+			}, &container.HostConfig{PortBindings: portMap}, nil, containerName)
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
 					Title: "Failed to launch container.",
