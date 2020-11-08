@@ -108,7 +108,7 @@ func init() {
 				log.Fatal(err)
 			}
 			defer conn.Close()
-			remoteAddr := conn.RemoteAddr().(*net.UDPAddr).IP.String()
+			remoteAddr := conn.LocalAddr().(*net.UDPAddr).IP.String()
 			_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
 
 			// Garbage collect.
