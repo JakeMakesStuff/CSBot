@@ -58,7 +58,7 @@ func init() {
 					return err
 				}
 				defer file.Close()
-				f, err := w.Create(path)
+				f, err := w.Create(path[len(persistenceDir):])
 				if err != nil {
 					return err
 				}
