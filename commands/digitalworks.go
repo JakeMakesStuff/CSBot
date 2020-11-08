@@ -46,7 +46,7 @@ func init() {
 			c, err := cli.ContainerInspect(context.TODO(), containerName)
 			if err == nil {
 				message := "You already have a DigitalWorks container running. This means you have 2 options:\n\n" +
-					"♻️ **Destroy the container:** You will want to do this if you want to change the resolution of your container. Note that this will not destroy your persistent folder on your desktop, but will destroy all other container content.\n" +
+					"♻️ **Destroy the container:** This wil destroy the running container. Note that this will not destroy your persistent folder on your desktop, but will destroy all other container content.\n" +
 					"✉️ **Re-send the credentials:** Resends the login credentials in a DM.\n\n" +
 					"Please react with the option you want."
 				msg, err := ctx.Reply(message)
