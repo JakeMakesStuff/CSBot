@@ -81,7 +81,7 @@ func init() {
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: "wine-digitalworks-vnc",
 				Env: env,
-			}, &container.HostConfig{PortBindings: portMap}, nil, msg.Author.ID.String() + "-vnc")
+			}, &container.HostConfig{PortBindings: portMap, PublishAllPorts: true}, nil, msg.Author.ID.String() + "-vnc")
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
 					Title: "Failed to launch container.",
