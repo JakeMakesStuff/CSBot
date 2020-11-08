@@ -118,7 +118,7 @@ func init() {
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: "wine-digitalworks-vnc",
 				Env: env,
-			}, &container.HostConfig{PortBindings: portMap, VolumesFrom: []string{persistenceDir+":/root/Desktop/Persistent Storage"}}, nil, containerName)
+			}, &container.HostConfig{PortBindings: portMap, Binds: []string{persistenceDir+":/root/Desktop/Persistent Storage"}}, nil, containerName)
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
 					Title: "Failed to launch container.",
