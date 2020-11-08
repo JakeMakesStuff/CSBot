@@ -31,31 +31,9 @@ func init() {
 
 	router.Router.SetCommand(&gommand.Command{
 		Name:                 "digitalworks",
-		Description:          "Start a sandboxed DigitalWorks VNC environment. You will then get DM'd the VNC hostname and password.",
-		Usage: "[width (defaults to 800)] [height (defaults to 600)]",
+		Description:          "Start a sandboxed DigitalWorks HTTP environment. You will then get DM'd the HTTP hostname and password.",
 		Category:             categories.Learning,
-		ArgTransformers: []gommand.ArgTransformer{
-			{
-				Function: gommand.UIntTransformer,
-				Optional: true,
-			},
-			{
-				Function: gommand.UIntTransformer,
-				Optional: true,
-			},
-		},
 		Function: func(ctx *gommand.Context) error {
-			// TODO: Add width and height support.
-			// Get the width and height.
-			width, _ := ctx.Args[0].(uint64)
-			if width == 0 {
-				width = 800
-			}
-			height, _ := ctx.Args[0].(uint64)
-			if height == 0 {
-				height = 600
-			}
-
 			// Handle if not configured.
 			if cli == nil {
 				_, _ = ctx.Reply("Docker is not configured.")
@@ -63,7 +41,7 @@ func init() {
 			}
 
 			// Check if the container already exists. If so manage showing the user options relating to this.
-			containerName := ctx.Message.Author.ID.String() + "-vnc"
+			containerName := ctx.Message.Author.ID.String() + "-http"
 			c, err := cli.ContainerInspect(context.TODO(), containerName)
 			if err == nil {
 				message := "You already have a DigitalWorks container running. This means you have 2 options:\n\n" +
@@ -100,7 +78,7 @@ func init() {
 							if password == "" {
 								return errors.New("password field is blank for some weird reason")
 							}
-							port := c.HostConfig.PortBindings["5900/tcp"][0].HostPort
+							port := c.HostConfig.PortBindings["80/tcp"][0].HostPort
 							_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
 							_, _ = ctx.Reply(ctx.Message.Author.Mention(), "Login credentials DM'd.")
 						}
@@ -125,7 +103,7 @@ func init() {
 			min := 12000
 			port := strconv.Itoa(rand.Intn(max - min) + min)
 			portMap := nat.PortMap{
-				"5900/tcp": {
+				"80/tcp": {
 					{
 						// TODO: We should probably make this less random, but realistically it's probably fine for now.
 						HostPort: port,
@@ -156,7 +134,7 @@ func init() {
 			_ = ctx.Session.DeleteMessage(context.TODO(), msg.ChannelID, msg.ID)
 
 			// Launch eval mode.
-			_, _ = ctx.Reply("DigitalWorks environment is now created. To use it, simply connect via VNC to the hostname and password specified in DM's. If you have DM's off, the bot will be unable to DM you, simply run the command again to get this.")
+			_, _ = ctx.Reply("DigitalWorks environment is now created. To use it, simply connect via HTTP to the hostname and password specified in DM's. If you have DM's off, the bot will be unable to DM you, simply run the command again to get this.")
 			conn, err := net.Dial("udp", "8.8.8.8:80")
 			if err != nil {
 				log.Fatal(err)
