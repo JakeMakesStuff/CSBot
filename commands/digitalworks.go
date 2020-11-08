@@ -68,11 +68,10 @@ func init() {
 			if err == nil {
 				message := "You already have a DigitalWorks container running. This means you have 2 options:\n\n" +
 					"♻️ **Destroy the container:** You will want to do this if you want to change the resolution of your container. Note that this will not destroy your persistent folder on your desktop, but will destroy all other container content.\n" +
-					"✉️ **Re-send the credentials:** Resends the login credentials in a DM."
+					"✉️ **Re-send the credentials:** Resends the login credentials in a DM.\n\n" +
+					"Please react with the option you want."
 				msg, err := ctx.Reply(message)
 				if err == nil {
-					_ = msg.React(context.TODO(), ctx.Session, "♻")
-					_ = msg.React(context.TODO(), ctx.Session, "✉")
 					deadline, _ := context.WithTimeout(context.TODO(), time.Minute*10)
 					r := ctx.WaitManager.WaitForMessageReactionAdd(deadline, func(_ disgord.Session, evt *disgord.MessageReactionAdd) bool {
 						return evt.MessageID == msg.ID && evt.UserID == ctx.Message.Author.ID && (evt.PartialEmoji.Name == "♻" || evt.PartialEmoji.Name == "✉️")
