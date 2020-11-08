@@ -22,6 +22,8 @@ import (
 )
 
 func init() {
+	rand.NewSource(time.Now().UnixNano())
+
 	cli, err := client.NewClient("unix:///var/run/docker.sock", "", nil, nil)
 	if err != nil {
 		fmt.Println("Unable to connect to Docker:", err.Error())
