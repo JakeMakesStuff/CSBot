@@ -16,6 +16,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -96,6 +97,10 @@ func init() {
 				return nil
 			}
 
+			// Make persistence folder if it doesn't exist.
+			persistenceDir := "/root/user_persistence/"+ctx.Message.Author.ID.String()
+			_ = os.MkdirAll(persistenceDir, 0777)
+
 			// Create the container.
 			password := uuid.New().String()
 			env := []string{"VNC_PASSWORD="+password}
@@ -113,7 +118,7 @@ func init() {
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: "wine-digitalworks-vnc",
 				Env: env,
-			}, &container.HostConfig{PortBindings: portMap}, nil, containerName)
+			}, &container.HostConfig{PortBindings: portMap, VolumesFrom: []string{persistenceDir+":/root/Desktop/Persistent Storage"}}, nil, containerName)
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
 					Title: "Failed to launch container.",
