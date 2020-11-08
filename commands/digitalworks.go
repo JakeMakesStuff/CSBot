@@ -3,6 +3,8 @@ package commands
 import (
 	"CSBot/categories"
 	"CSBot/router"
+	"archive/zip"
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -13,10 +15,12 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
+	"io"
 	"log"
 	"math/rand"
 	"net"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +33,62 @@ func init() {
 	if err != nil {
 		fmt.Println("Unable to connect to Docker:", err.Error())
 	}
+
+	router.Router.SetCommand(&gommand.Command{
+		Name: "downloadpersistent",
+		Description: "Downloads the persistent storage on the DigitalWorks container.",
+		Category: categories.Learning,
+		Function: func(ctx *gommand.Context) error {
+			persistenceDir := "/root/user_persistence/"+ctx.Message.Author.ID.String()
+			if _, err := os.Stat(persistenceDir); os.IsNotExist(err) {
+				_, _ = ctx.Reply("No container currently exists for your user.")
+				return nil
+			}
+			b := &bytes.Buffer{}
+			w := zip.NewWriter(b)
+			defer w.Close()
+			walker := func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if info.IsDir() {
+					return nil
+				}
+				file, err := os.Open(path)
+				if err != nil {
+					return err
+				}
+				defer file.Close()
+				f, err := w.Create(path)
+				if err != nil {
+					return err
+				}
+				_, err = io.Copy(f, file)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+			err = filepath.Walk("input", walker)
+			if err != nil {
+				panic(err)
+			}
+			channel, err := ctx.Session.CreateDM(context.TODO(), ctx.Message.Author.ID)
+			if err == nil {
+				_, err = ctx.Session.SendMsg(context.TODO(), channel.ID, &disgord.CreateMessageFileParams{
+					Reader:     b,
+					FileName:   "content.zip",
+					SpoilerTag: false,
+				})
+			}
+			if err == nil {
+				_, _ = ctx.Reply("DM'd storage.")
+			} else {
+				_, _ = ctx.Reply("Unable to send storage. Is the folder over the Discord file size limit or your DMs are off?")
+			}
+			return nil
+		},
+	})
 
 	router.Router.SetCommand(&gommand.Command{
 		Name:                 "digitalworks",
