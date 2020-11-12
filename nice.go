@@ -11,7 +11,6 @@ import (
 
 func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 	if evt.Message.Author.Bot || len(evt.Message.Attachments) == 0 {
-		// ignore this - is a bot or no attachments
 		return
 	}
 	go func() {
