@@ -27,6 +27,7 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 				}
 			}
 		}
+		fmt.Println(images)
 		if len(images) == 0 {
 			return
 		}
@@ -53,7 +54,6 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 				// Load image into gosseract.
 				gClient := gosseract.NewClient()
 				if err = gClient.SetImageFromBytes(b); err != nil {
-					fmt.Println("lmage load error: ", err.Error())
 					return
 				}
 
