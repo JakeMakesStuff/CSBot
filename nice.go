@@ -58,8 +58,8 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 
 				// Gets the text content.
 				if text, err := gClient.Text(); err == nil {
+					fmt.Println(evt.Message, text)
 					if strings.Contains(text, "69") {
-						fmt.Println(evt.Message)
 						_, _  = s.SendMsg(context.TODO(), evt.Message.ChannelID, evt.Message.Author.Mention(), "nice")
 					}
 				}
