@@ -19,6 +19,7 @@ require (
 	github.com/jakemakesstuff/structuredhttp v0.0.0-20201005102351-90f89384e643
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/otiai10/gosseract v2.2.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.4.1
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5

@@ -14,12 +14,12 @@ import (
 func main() {
 	s, err := disgord.NewClient(disgord.Config{
 		BotToken: os.Getenv("TOKEN"),
-
 	})
 	if err != nil {
 		panic(err)
 	}
 	s.On(disgord.EvtMessageCreate, messageCreateChair)
+	s.On(disgord.EvtMessageCreate, messageCreateNice)
 	router.Router.Hook(s)
 	router.Router.GetCommand("help").(*gommand.Command).Category = categories.Informational
 	err = s.StayConnectedUntilInterrupted(context.TODO())
