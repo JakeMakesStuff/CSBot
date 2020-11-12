@@ -27,7 +27,6 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 				}
 			}
 		}
-		fmt.Println(images)
 		if len(images) == 0 {
 			return
 		}
@@ -35,7 +34,7 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 		// Process each possible image.
 		for _, v := range images {
 			go func(v *disgord.Attachment) {
-				// Try and get the contents of the iamge.
+				// Try and get the contents of the image.
 				resp, err := structuredhttp.GET(v.URL).Run()
 				if err != nil {
 					fmt.Println(err.Error())
@@ -60,6 +59,7 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 				// Gets the text content.
 				if text, err := gClient.Text(); err == nil {
 					if strings.Contains(text, "69") {
+						fmt.Println(evt.Message)
 						_, _  = s.SendMsg(context.TODO(), evt.Message.ChannelID, evt.Message.Author.Mention(), "nice")
 					}
 				}
