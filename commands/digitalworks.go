@@ -35,11 +35,11 @@ func init() {
 	}
 
 	router.Router.SetCommand(&gommand.Command{
-		Name: "downloadpersistent",
+		Name:        "downloadpersistent",
 		Description: "Downloads the persistent storage on the DigitalWorks container.",
-		Category: categories.Learning,
+		Category:    categories.Learning,
 		Function: func(ctx *gommand.Context) error {
-			persistenceDir := "/root/user_persistence/"+ctx.Message.Author.ID.String()
+			persistenceDir := "/root/user_persistence/" + ctx.Message.Author.ID.String()
 			if _, err := os.Stat(persistenceDir); os.IsNotExist(err) {
 				_, _ = ctx.Reply("No container currently exists for your user.")
 				return nil
@@ -91,9 +91,9 @@ func init() {
 	})
 
 	router.Router.SetCommand(&gommand.Command{
-		Name:                 "digitalworks",
-		Description:          "Start a sandboxed DigitalWorks HTTP environment. You will then get DM'd the HTTP hostname and password.",
-		Category:             categories.Learning,
+		Name:        "digitalworks",
+		Description: "Start a sandboxed DigitalWorks HTTP environment. You will then get DM'd the HTTP hostname and password.",
+		Category:    categories.Learning,
 		Function: func(ctx *gommand.Context) error {
 			// Handle if not configured.
 			if cli == nil {
@@ -140,7 +140,7 @@ func init() {
 								return errors.New("password field is blank for some weird reason")
 							}
 							port := c.HostConfig.PortBindings["80/tcp"][0].HostPort
-							_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
+							_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: " + remoteAddr + ":" + port + "\nPassword: " + password})
 							_, _ = ctx.Reply(ctx.Message.Author.Mention(), "Login credentials DM'd.")
 						}
 					}
@@ -150,7 +150,7 @@ func init() {
 
 			// Send the initial embed for starting the container.
 			msg, err := ctx.Reply(&disgord.Embed{
-				Title: "Creating Docker Container...",
+				Title:       "Creating Docker Container...",
 				Description: "Creating a Docker container which contains your DigitalWorks environment.",
 			})
 			if err != nil {
@@ -158,15 +158,15 @@ func init() {
 			}
 
 			// Make persistence folder if it doesn't exist.
-			persistenceDir := "/root/user_persistence/"+ctx.Message.Author.ID.String()
+			persistenceDir := "/root/user_persistence/" + ctx.Message.Author.ID.String()
 			_ = os.MkdirAll(persistenceDir, 0777)
 
 			// Create the container.
 			password := uuid.New().String()
-			env := []string{"VNC_PASSWORD="+password}
+			env := []string{"VNC_PASSWORD=" + password}
 			max := 12999
 			min := 12000
-			port := strconv.Itoa(rand.Intn(max - min) + min)
+			port := strconv.Itoa(rand.Intn(max-min) + min)
 			portMap := nat.PortMap{
 				"80/tcp": {
 					{
@@ -177,11 +177,11 @@ func init() {
 			}
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: "wine-digitalworks-vnc",
-				Env: env,
-			}, &container.HostConfig{PortBindings: portMap, Binds: []string{persistenceDir+":/root/Desktop/Persistent Storage"}}, nil, containerName)
+				Env:   env,
+			}, &container.HostConfig{PortBindings: portMap, Binds: []string{persistenceDir + ":/root/Desktop/Persistent Storage"}}, nil, containerName)
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-					Title: "Failed to launch container.",
+					Title:       "Failed to launch container.",
 					Description: err.Error(),
 				}).Execute()
 				return nil
@@ -189,7 +189,7 @@ func init() {
 			err = cli.ContainerStart(context.TODO(), res.ID, types.ContainerStartOptions{})
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-					Title: "Failed to start container.",
+					Title:       "Failed to start container.",
 					Description: err.Error(),
 				}).Execute()
 				return nil
@@ -206,7 +206,7 @@ func init() {
 			}
 			defer conn.Close()
 			remoteAddr := conn.LocalAddr().(*net.UDPAddr).IP.String()
-			_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: "+remoteAddr+":"+port+"\nPassword: "+password})
+			_, _, _ = ctx.Message.Author.SendMsg(context.TODO(), ctx.Session, &disgord.Message{Content: "Hostname: " + remoteAddr + ":" + port + "\nPassword: " + password})
 
 			// Return no errors.
 			return nil

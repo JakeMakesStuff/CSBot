@@ -118,8 +118,8 @@ func messageCreateChair(s disgord.Session, evt *disgord.MessageCreate) {
 				logrus.Error(err)
 				return
 			}
-			chairs := make([]struct{
-				couch bool
+			chairs := make([]struct {
+				couch  bool
 				region *pb.LocalizedObjectAnnotation
 			}, 0, len(crops))
 			for _, v := range crops {

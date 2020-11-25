@@ -10,7 +10,6 @@ import (
 	"os"
 )
 
-
 func main() {
 	s, err := disgord.NewClient(disgord.Config{
 		BotToken: os.Getenv("TOKEN"),

@@ -20,7 +20,7 @@ func init() {
 			if err != nil {
 				return nil
 			}
-			_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetContent( "🏓 **Pong!** " + durafmt.Parse(time.Now().UTC().Sub(t1)).String()).Execute()
+			_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetContent("🏓 **Pong!** " + durafmt.Parse(time.Now().UTC().Sub(t1)).String()).Execute()
 			return nil
 		},
 	})

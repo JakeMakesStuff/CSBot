@@ -53,7 +53,7 @@ func formatQuery(res *sql.Rows) (formatted string, rows int) {
 		// Run the scan.
 		err := res.Scan(ptrs...)
 		if err != nil {
-			formatted = "decoding error: "+err.Error()
+			formatted = "decoding error: " + err.Error()
 		}
 
 		// Get the row as string.
@@ -146,7 +146,7 @@ func processMd(text string) string {
 				blockTotal--
 				if blockTotal == 0 {
 					// This is our block. Process this.
-					text = text[blockStart:len(text)-blockStart]
+					text = text[blockStart : len(text)-blockStart]
 					if strings.HasPrefix(text, "sql\n") {
 						text = text[4:]
 					}
@@ -175,10 +175,10 @@ func init() {
 	}
 
 	router.Router.SetCommand(&gommand.Command{
-		Name:                 "sql",
-		Description:          "Start a sandboxed Oracle SQL environment.",
-		Usage: "[use mysql (true/false, defaults to false)]",
-		Category:             categories.Learning,
+		Name:        "sql",
+		Description: "Start a sandboxed Oracle SQL environment.",
+		Usage:       "[use mysql (true/false, defaults to false)]",
+		Category:    categories.Learning,
 		ArgTransformers: []gommand.ArgTransformer{
 			{
 				Function: gommand.BooleanTransformer,
@@ -197,7 +197,7 @@ func init() {
 
 			// Send the initial embed for starting the container.
 			msg, err := ctx.Reply(&disgord.Embed{
-				Title: "Creating Docker Container...",
+				Title:       "Creating Docker Container...",
 				Description: "Creating a Docker container which contains your database.",
 			})
 			if err != nil {
@@ -211,11 +211,11 @@ func init() {
 			}
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
 				Image: image,
-				Env: env,
+				Env:   env,
 			}, nil, nil, msg.ID.String())
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-					Title: "Failed to launch container.",
+					Title:       "Failed to launch container.",
 					Description: err.Error(),
 				}).Execute()
 				return nil
@@ -223,7 +223,7 @@ func init() {
 			err = cli.ContainerStart(context.TODO(), res.ID, types.ContainerStartOptions{})
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-					Title: "Failed to start container.",
+					Title:       "Failed to start container.",
 					Description: err.Error(),
 				}).Execute()
 				return nil
@@ -231,7 +231,7 @@ func init() {
 
 			// Send an embed whilst we wait for the DB to initialise.
 			_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-				Title: "Waiting for the database to initialise...",
+				Title:       "Waiting for the database to initialise...",
 				Description: "Waiting for the database container to report as healthy.",
 			}).Execute()
 			var info types.ContainerJSON
@@ -241,7 +241,7 @@ func init() {
 				if err != nil {
 					_ = cli.ContainerRemove(context.TODO(), res.ID, types.ContainerRemoveOptions{Force: true})
 					_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-						Title: "Failed to get container info.",
+						Title:       "Failed to get container info.",
 						Description: err.Error(),
 					}).Execute()
 					return nil
@@ -251,7 +251,7 @@ func init() {
 				if !info.State.Running {
 					_ = cli.ContainerRemove(context.TODO(), res.ID, types.ContainerRemoveOptions{Force: true})
 					_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
-						Title: "The container died.",
+						Title:       "The container died.",
 						Description: "The container seems to have died during birth. Please try rerunning this command.",
 					}).Execute()
 					return nil
@@ -267,11 +267,11 @@ func init() {
 			}
 
 			// Attempt to connect to the DB.
-			dataSourceName := `user="system" password="Oradoc_db1" connectString="`+info.NetworkSettings.IPAddress+`/ORCLCDB.localdomain"`
+			dataSourceName := `user="system" password="Oradoc_db1" connectString="` + info.NetworkSettings.IPAddress + `/ORCLCDB.localdomain"`
 			driverName := "godror"
 			if mysql {
 				driverName = "mysql"
-				dataSourceName = "root:@tcp("+info.NetworkSettings.IPAddress+")/sandbox"
+				dataSourceName = "root:@tcp(" + info.NetworkSettings.IPAddress + ")/sandbox"
 			}
 			db, err := sql.Open(driverName, dataSourceName)
 			if err != nil {
@@ -363,7 +363,7 @@ func init() {
 							timesAdded += v
 						}
 						return &disgord.EmbedFooter{
-							Text:         strconv.Itoa(totalRows)+" rows affected | Time taken: "+durafmt.Parse(timesAdded).String()+" | use `exit` to exit eval mode",
+							Text: strconv.Itoa(totalRows) + " rows affected | Time taken: " + durafmt.Parse(timesAdded).String() + " | use `exit` to exit eval mode",
 						}
 					}
 
@@ -400,10 +400,10 @@ func init() {
 								x := []interface{}{
 									ctx.Message.Author.Mention(),
 									&disgord.Embed{
-										Title: "SQL query failed",
-										Description: "```"+err.Error()+"```\n"+additionalInfo,
-										Footer: createFooter(),
-										Color: 0xFF0000,
+										Title:       "SQL query failed",
+										Description: "```" + err.Error() + "```\n" + additionalInfo,
+										Footer:      createFooter(),
+										Color:       0xFF0000,
 									},
 								}
 								if len(formattedResults) != 0 {
@@ -412,13 +412,13 @@ func init() {
 
 									// Render the file.
 									for i, v := range formattedResults {
-										content += "---\nQuery "+strconv.Itoa(i)+" (took "+durafmt.Parse(queryTimes[i]).String()+"):\n---\n"+v+"\n"
+										content += "---\nQuery " + strconv.Itoa(i) + " (took " + durafmt.Parse(queryTimes[i]).String() + "):\n---\n" + v + "\n"
 									}
 
 									// Add the file.
 									x = append(x, &disgord.CreateMessageFileParams{
-										Reader:     strings.NewReader(content),
-										FileName:   "before_queries.txt",
+										Reader:   strings.NewReader(content),
+										FileName: "before_queries.txt",
 									})
 								}
 
@@ -441,10 +441,10 @@ func init() {
 					} else {
 						// Format the results.
 						for i, v := range formattedResults {
-							content += "---\nQuery "+strconv.Itoa(i)+" (took "+durafmt.Parse(queryTimes[i]).String()+"):\n---\n"+v+"\n"
+							content += "---\nQuery " + strconv.Itoa(i) + " (took " + durafmt.Parse(queryTimes[i]).String() + "):\n---\n" + v + "\n"
 						}
 					}
-					description := "```\n"+content+"```"
+					description := "```\n" + content + "```"
 					large := false
 					if len(description) > 2048 {
 						large = true
@@ -454,10 +454,10 @@ func init() {
 					x := []interface{}{
 						ctx.Message.Author.Mention(),
 						&disgord.Embed{
-							Title: "SQL query result",
+							Title:       "SQL query result",
 							Description: description,
-							Footer: createFooter(),
-							Color: 0x00FF00,
+							Footer:      createFooter(),
+							Color:       0x00FF00,
 						},
 					}
 					if large {
