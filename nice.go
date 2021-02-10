@@ -27,6 +27,7 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 			}
 		}
 		if len(images) == 0 {
+			// No images to process.
 			return
 		}
 
@@ -49,15 +50,14 @@ func messageCreateNice(s disgord.Session, evt *disgord.MessageCreate) {
 					return
 				}
 
-				// Load image into gosseract.
+				// Load image into gosseract and get the text content.
 				gClient := gosseract.NewClient()
 				if err = gClient.SetImageFromBytes(b); err != nil {
 					return
 				}
-
-				// Gets the text content.
 				if text, err := gClient.Text(); err == nil {
 					if strings.Contains(text, "69") {
+						niceLog(text)
 						_, _ = s.SendMsg(context.TODO(), evt.Message.ChannelID, evt.Message.Author.Mention(), "nice")
 					}
 				} else {

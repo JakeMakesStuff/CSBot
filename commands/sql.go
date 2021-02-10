@@ -177,7 +177,6 @@ func init() {
 	router.Router.SetCommand(&gommand.Command{
 		Name:        "sql",
 		Description: "Start a sandboxed Oracle SQL environment.",
-		Usage:       "[use mysql (true/false, defaults to false)]",
 		Category:    categories.Learning,
 		ArgTransformers: []gommand.ArgTransformer{
 			{
@@ -186,9 +185,6 @@ func init() {
 			},
 		},
 		Function: func(ctx *gommand.Context) error {
-			// Defines if we should use mysql.
-			mysql, _ := ctx.Args[0].(bool)
-
 			// Handle if not configured.
 			if cli == nil {
 				_, _ = ctx.Reply("Docker is not configured.")
@@ -203,15 +199,9 @@ func init() {
 			if err != nil {
 				return nil
 			}
-			image := "store/oracle/database-enterprise:12.2.0.1-slim"
-			var env []string
-			if mysql {
-				image = "healthcheck/mysql"
-				env = []string{"MYSQL_ALLOW_EMPTY_PASSWORD=yes", "MYSQL_DATABASE=sandbox"}
-			}
 			res, err := cli.ContainerCreate(context.TODO(), &container.Config{
-				Image: image,
-				Env:   env,
+				Image: "healthcheck/mysql",
+				Env:   []string{"MYSQL_ALLOW_EMPTY_PASSWORD=yes", "MYSQL_DATABASE=sandbox"},
 			}, nil, nil, msg.ID.String())
 			if err != nil {
 				_, _ = ctx.Session.UpdateMessage(context.TODO(), msg.ChannelID, msg.ID).SetEmbed(&disgord.Embed{
@@ -267,26 +257,10 @@ func init() {
 			}
 
 			// Attempt to connect to the DB.
-			dataSourceName := `user="system" password="Oradoc_db1" connectString="` + info.NetworkSettings.IPAddress + `/ORCLCDB.localdomain"`
-			driverName := "godror"
-			if mysql {
-				driverName = "mysql"
-				dataSourceName = "root:@tcp(" + info.NetworkSettings.IPAddress + ")/sandbox"
-			}
-			db, err := sql.Open(driverName, dataSourceName)
+			db, err := sql.Open("mysql", "root:@tcp(" + info.NetworkSettings.IPAddress + ")/sandbox")
 			if err != nil {
 				_, _ = ctx.Reply(ctx.Message.Author.Mention(), err.Error())
 				return nil
-			}
-
-			// Loop until a ping succeeds to get around a bug with the Oracle DB official docker image where the user isn't immediately made when the node reports healthy.
-			if !mysql {
-				for {
-					if err := db.Ping(); err == nil {
-						break
-					}
-					time.Sleep(100 * time.Millisecond)
-				}
 			}
 
 			// Delete the old message.
