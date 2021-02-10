@@ -13,7 +13,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/godror/godror"
 	"github.com/hako/durafmt"
 	"github.com/jakemakesstuff/structuredhttp"
 	"github.com/olekukonko/tablewriter"
