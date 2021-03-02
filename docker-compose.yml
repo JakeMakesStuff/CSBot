@@ -1,0 +1,22 @@
+services:
+  bot:
+    build: .
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./gcp-creds.json:/var/token.json
+    environment:
+      - TOKEN
+      - CONNECTION_STRING=postgres://postgres:69csbot420pogchamp@postgres/csbot
+      - GOOGLE_APPLICATION_CREDENTIALS=/var/token.json
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 69csbot420pogchamp
+      POSTGRES_DB: csbot
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine
+FROM golang:1.16-alpine
 WORKDIR /var/app
 COPY . .
 RUN apk add gcc g++ wget tesseract-ocr-dev

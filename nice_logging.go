@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	niceLock	= sync.RWMutex{}
+	niceLock    = sync.RWMutex{}
 	niceContent = ""
 )
 

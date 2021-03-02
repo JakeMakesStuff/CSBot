@@ -19,6 +19,7 @@ func main() {
 	}
 	s.On(disgord.EvtMessageCreate, messageCreateChair)
 	s.On(disgord.EvtMessageCreate, messageCreateNice)
+	s.On(disgord.EvtMessageCreate, messageCreateEcho)
 	router.Router.Hook(s)
 	router.Router.GetCommand("help").(*gommand.Command).Category = categories.Informational
 	err = s.StayConnectedUntilInterrupted(context.TODO())

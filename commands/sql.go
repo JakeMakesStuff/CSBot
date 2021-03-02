@@ -256,7 +256,7 @@ func init() {
 			}
 
 			// Attempt to connect to the DB.
-			db, err := sql.Open("mysql", "root:@tcp(" + info.NetworkSettings.IPAddress + ")/sandbox")
+			db, err := sql.Open("mysql", "root:@tcp("+info.NetworkSettings.IPAddress+")/sandbox")
 			if err != nil {
 				_, _ = ctx.Reply(ctx.Message.Author.Mention(), err.Error())
 				return nil
