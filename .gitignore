@@ -1,3 +1,4 @@
 .idea/
 gcp-creds.json
 postgres
+.DS_Store
